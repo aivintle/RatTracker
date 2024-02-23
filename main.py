@@ -14,6 +14,7 @@ class RatTracker(tk.Tk):
 
     def startVariables(self):
         self.filepath = tk.StringVar()
+        self.savepath = tk.StringVar()
         self.filepath.set("Enter a filepath.")
         self.frame_init = tk.IntVar()
         self.frame_init.set(0)
@@ -33,10 +34,10 @@ class RatTracker(tk.Tk):
 
         file_font = ("bold")
         self.s1_file_label = tk.Label(self.screen_1, text = "File: ", font = file_font, background = "yellow", padx = 20, pady = 20)
-        self.s1_file_label.grid(row = 1, column = 1, sticky = "W")
+        self.s1_file_label.grid(row = 1, column = 1)
 
         self.s1_file_entry = tk.Entry(self.screen_1, textvariable = self.filepath, state = "readonly")
-        self.s1_file_entry.grid(row = 1, column = 2, sticky = "W")
+        self.s1_file_entry.grid(row = 1, column = 2)
 
 
         self.s1_open_button = tk.Button(self.screen_1, text = "Open", command = self.open_file)
@@ -53,10 +54,10 @@ class RatTracker(tk.Tk):
         self.screen_2.grid(row = 0, column = 0, sticky = "nsew")
         self.screen_2.configure(background = "yellow")
 
-        self.s2_viewer_label = tk.Label(self.screen_2, text = "IMAGE GOES HERE")
+        self.s2_viewer_label = tk.Label(self.screen_2, text = "IMAGE GOES HERE", background = "yellow")
         self.s2_viewer_label.grid(row = 0, column = 0, rowspan = 4, columnspan = 8, padx = 20, pady = 20)
 
-        self.s2_frame_changer_label = tk.Label(self.screen_2, text = "Frame Changer")
+        self.s2_frame_changer_label = tk.Label(self.screen_2, text = "Frame Changer", background = "yellow")
         self.s2_frame_changer_label.grid(row = 4, column = 0, columnspan = 8, padx = 20, pady = 20)
 
         self.s2_frame_changer_scale = tk.Scale(self.screen_2, from_ = 0, to = 10, variable = self.frame_init, orient = "horizontal")
@@ -69,7 +70,7 @@ class RatTracker(tk.Tk):
         self.s2_frame_offset_frame.grid(row = 0, column = 8, rowspan = 5, columnspan = 5)
         self.s2_frame_offset_frame.configure(background = "yellow")
 
-        self.s2_frame_offset_label = tk.Label(self.s2_frame_offset_frame, text = "Frame Offset")
+        self.s2_frame_offset_label = tk.Label(self.s2_frame_offset_frame, text = "Frame Offset", background = "yellow")
         self.s2_frame_offset_label.grid(row = 0, column = 0, columnspan = 5, padx = 5, pady = 5)
 
         self.s2_top_up_button = tk.Button(self.s2_frame_offset_frame, command = self.top_Up)
@@ -90,7 +91,7 @@ class RatTracker(tk.Tk):
         self.s2_left_down_button.grid(row = 3, column = 1, padx = 5, pady = 5)
         self.s2_right_down_button.grid(row = 3, column = 3, padx = 5, pady = 5)
 
-        self.s2_file_label = tk.Label(self.screen_2, text = self.filepath.get())
+        self.s2_file_label = tk.Label(self.screen_2, text = self.filepath.get(), background = "yellow")
         self.s2_file_label.grid(row = 5, column = 8, columnspan = 5)
         
         self.s2_previous_button = tk.Button(self.screen_2, text = "Previous", command = self.swap_2_to_1)
@@ -104,14 +105,23 @@ class RatTracker(tk.Tk):
         self.screen_3.grid(row = 0, column = 0, sticky = "nsew")
         self.screen_3.configure(background = "yellow")
 
-        self.s3_viewer_label = tk.Label(self.screen_3, text = "IMAGE GOES HERE")
+        self.s3_viewer_label = tk.Label(self.screen_3, text = "IMAGE GOES HERE", background = "yellow")
         self.s3_viewer_label.grid(row = 0, column = 0, rowspan = 4, columnspan = 8, padx = 20, pady = 20)
+
+        self.s3_save_data_label = tk.Label(self.screen_3, text = "Save Data", background = "yellow")
+        self.s3_save_data_label.grid(row = 5, column = 0, columnspan = 3, padx = 20, pady = 20)
+
+        self.s3_save_data_entry = tk.Entry(self.screen_3, textvariable = self.savepath, state = "readonly")
+        self.s3_save_data_entry.grid(row = 5, column = 3, columnspan = 5, padx = 20, pady = 20)
+
+        self.s3_save_location_button = tk.Button(self.screen_3, text = "Change", command = self.save_file)
+        self.s3_save_location_button.grid(row = 5, column = 8, columnspan = 5, padx = 20, pady = 20)
 
         self.s3_previous_button = tk.Button(self.screen_3, text = "Previous", command = self.swap_3_to_2)
         self.s3_previous_button.grid(row = 6, column = 0, padx = 20, pady = 20)
         
         self.s3_finish_button = tk.Button(self.screen_3, text = "Finish")
-        self.s3_finish_button.grid(row = 6, column = 1, padx = 20, pady = 20)
+        self.s3_finish_button.grid(row = 6, column = 12, padx = 20, pady = 20)
 
     def swap_1_to_2(self):
         self.screen_1.grid_forget()
@@ -168,6 +178,9 @@ class RatTracker(tk.Tk):
         self.s2_update()
 
     def s2_update(self):
+        pass
+
+    def save_file(self):
         pass
 
 def main(): 

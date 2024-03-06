@@ -66,18 +66,18 @@ class RatTracker(tk.Tk):
         self.screen_2.grid(row = 0, column = 0, sticky = "nsew")
         self.screen_2.configure(background = "yellow")
 
-        self.s2_viewer_label = ImageLabel(self.filepath.get(), self.frame_init.get())
-        self.s2_viewer_label.grid(row = 0, column = 0, rowspan = 4, columnspan = 8, padx = 20, pady = 20, sticky = "nw")
+        self.s2_viewer_label = ImageLabel(self.filepath.get(), self.frame_init.get(), master = self.screen_2, background = "yellow")
+        self.s2_viewer_label.grid(row = 0, column = 0, rowspan = 4, columnspan = 8, padx = 20, pady = 20, sticky = "nsew")
 
         self.s2_frame_changer_label = tk.Label(self.screen_2, text = "Frame Changer", background = "yellow")
         self.s2_frame_changer_label.grid(row = 4, column = 0, columnspan = 7, padx = 20, pady = 20, sticky = "ew")
 
         self.s2_scale_max = self.s2_viewer_label.getMax()
         
-        self.s2_frame_changer_scale = tk.Scale(self.screen_2, variable = self.frame_init, background = "yellow", command = self.s2_update_num, orient = "horizontal", from_ = 0, to = self.s2_scale_max)
+        self.s2_frame_changer_scale = tk.Scale(self.screen_2, variable = self.frame_init, background = "yellow", command = self.s2_update_num, orient = "horizontal", from_ = 1, to = self.s2_scale_max)
         self.s2_frame_changer_scale.grid(row = 5, column = 0, columnspan = 5, padx = 20, pady = 20, sticky = "ew")
 
-        self.s2_frame_changer_entry = tk.Spinbox(self.screen_2, textvariable = self.frame_init, command = self.s2_update, from_ = 0, to = self.s2_scale_max)
+        self.s2_frame_changer_entry = tk.Spinbox(self.screen_2, textvariable = self.frame_init, command = self.s2_update, from_ = 1, to = self.s2_scale_max)
         self.s2_frame_changer_entry.grid(row = 5, column = 5, columnspan = 3, padx = 20, pady = 20)
 
         self.s2_frame_offset_frame = tk.Frame(self.screen_2)
@@ -105,6 +105,9 @@ class RatTracker(tk.Tk):
         self.s2_left_down_button.grid(row = 3, column = 1, pady = 5, sticky = "ew")
         self.s2_right_down_button.grid(row = 3, column = 3, pady = 5, sticky = "ew")
 
+        self.s2_save_button = tk.Button(self.s2_frame_offset_frame, command = self.save_Image, background = "purple")
+        self.s2_save_button.grid(row = 3, column = 2, sticky = "nsew")
+
         self.s2_file_label = tk.Label(self.screen_2, text = self.filepath.get(), background = "yellow")
         self.s2_file_label.grid(row = 5, column = 8, columnspan = 5)
         
@@ -116,6 +119,10 @@ class RatTracker(tk.Tk):
 
         self.screen_2.grid_rowconfigure(0, weight = 1)
         self.screen_2.grid_columnconfigure(0, weight = 1)
+        try:
+            self.s2_update_offsets()
+        except:
+            pass
 
 
     def startScreen3(self):
@@ -123,8 +130,8 @@ class RatTracker(tk.Tk):
         self.screen_3.grid(row = 0, column = 0, sticky = "nsew")
         self.screen_3.configure(background = "yellow")
 
-        self.s3_viewer_label = tk.Label(self.screen_3, text = "IMAGE GOES HERE", background = "yellow")
-        self.s3_viewer_label.grid(row = 0, column = 0, rowspan = 4, columnspan = 8, padx = 20, pady = 20, sticky = "ew")
+        self.s3_viewer_label = ImageLabel2(self.filepath.get(), self.x, self.y, self.w, self.h, master = self.screen_3)
+        self.s3_viewer_label.grid(row = 0, column = 0, rowspan = 4, columnspan = 8, padx = 20, pady = 20, sticky = "nw")
 
         self.s3_save_data_label = tk.Label(self.screen_3, text = "Save Data", background = "yellow")
         self.s3_save_data_label.grid(row = 5, column = 0, columnspan = 3, padx = 20, pady = 20, sticky = "w")
@@ -161,7 +168,7 @@ class RatTracker(tk.Tk):
         self.s3_previous_button = tk.Button(self.screen_3, text = "Previous", command = self.swap_3_to_2)
         self.s3_previous_button.grid(row = 6, column = 0, padx = 20, pady = 20)
         
-        self.s3_finish_button = tk.Button(self.screen_3, text = "Finish")
+        self.s3_finish_button = tk.Button(self.screen_3, text = "Finish", command = self.save_file)
         self.s3_finish_button.grid(row = 6, column = 12, padx = 20, pady = 20)
 
         self.screen_3.grid_rowconfigure(0, weight = 1)
@@ -173,16 +180,20 @@ class RatTracker(tk.Tk):
             self.screen_1.grid_forget()
             self.startScreen2()
         else:
-##            raise AssertionError("No file specified")
-            pass
+            raise AssertionError("No file specified")
 
     def swap_2_to_1(self):
         self.screen_2.grid_forget()
         self.startScreen1()
 
     def swap_2_to_3(self):
-        self.screen_2.grid_forget()
-        self.startScreen3()
+        try:
+            self.x, self.y, self.w, self.h = self.s2_viewer_label.getBox()
+        except:
+            raise AssertionError("No bounding box found")
+        if self.x:
+            self.screen_2.grid_forget()
+            self.startScreen3()
 
     def swap_3_to_2(self):
         self.screen_3.grid_forget()
@@ -230,6 +241,9 @@ class RatTracker(tk.Tk):
         self.right_offset = self.right_offset - self.offset_interval
         self.s2_update_offsets()
 
+    def save_Image(self):
+        self.s2_viewer_label.capture()
+
     def s2_update(self):
         frameNumber = self.frame_init.get()
         self.s2_viewer_label.update(frameNumber)
@@ -242,6 +256,7 @@ class RatTracker(tk.Tk):
         self.s2_update()
 
     def save_file(self):
+##        Save data in save file, raise error if file not found
         pass
 
     def toggle_line_ellipse(self):
@@ -251,12 +266,13 @@ class RatTracker(tk.Tk):
         pass
 
 class ImageLabel(tk.Frame):
-    def __init__(self, file, frameNumber):
+    def __init__(self, file, frameNumber, **kwargs):
         self.initConstants()
         self.initVideo(file)
-        super().__init__()
+        super().__init__(**kwargs)
         self.label = tk.Label(self)
-        self.label.grid(row = 0, column = 0, sticky = "nsew")
+        self.label.pack(fill=tk.BOTH)
+        self.label.configure(background = "yellow")
         self.update(frameNumber)
 
     def initConstants(self):
@@ -285,6 +301,7 @@ class ImageLabel(tk.Frame):
     def nextFrame(self):
         for i in range(increment):
             ret, self.frame = self.cap.read(cv2.COLOR_BGR2GRAY)
+        self.detectCrop()
         img = Image.fromarray(self.frame)
         resize_image = img.resize((self.width, self.height))
         self.img = ImageTk.PhotoImage(resize_image)
@@ -313,7 +330,7 @@ class ImageLabel(tk.Frame):
                 perimeter = cv2.arcLength(i, True)
                 approx = cv2.approxPolyDP(i, 0.02*perimeter, True)
                 if len(approx) == 4:
-                    cv2.drawContours(self.frame, [i], -1, (0,255,0), 3)
+##                    cv2.drawContours(self.frame, [i], -1, (0,255,0), 3)
                     x, y, w, h = cv2.boundingRect(approx)
                     Area = w*h
                     if (Area > maxArea):
@@ -331,6 +348,68 @@ class ImageLabel(tk.Frame):
         self.offset_x_max = off_x_max
         self.offset_y_min = off_y_min
         self.offset_y_max = off_y_max
+
+    def getBox(self):
+        return self.x, self.y, self.w, self.h
+
+    def capture(self):
+        cv2.imwrite("Save Image.png", self.frame)
+
+class ImageLabel2(tk.Frame):
+    def __init__(self, file, x, y, w, h, **kwargs):
+        self.initConstants()
+        self.setBox(x, y, w, h)
+        self.initVideo(file)
+        super().__init__(**kwargs)
+        self.label = tk.Label(self)
+        self.label.pack(fill=tk.BOTH)
+        self.configure(background = self.background_color)
+        self.update(1)
+
+    def initConstants(self):
+        self.background_color = "gray"
+        self.incriment = 1
+
+    def initVideo(self, file):
+        print(file)
+        self.cap = cv2.VideoCapture(file)
+        if not self.cap.isOpened():
+            raise AssertionError("Cannot open camera")
+
+    def update(self, frameNumber):
+        self.label.update()
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, frameNumber - 1)
+        ret, self.frame = self.cap.read(cv2.COLOR_BGR2GRAY)
+        self.crop()
+        img = Image.fromarray(self.frame)
+        self.img = ImageTk.PhotoImage(img)
+        self.label.configure(image = self.img)
+
+    def nextFrame(self):
+        for i in range(increment):
+            ret, self.frame = self.cap.read(cv2.COLOR_BGR2GRAY)
+        self.crop()
+        img = Image.fromarray(self.frame)
+        resize_image = img.resize((self.width, self.height))
+        self.img = ImageTk.PhotoImage(resize_image)
+        self.label.configure(image = self.img)
+
+    def setBox(self, x, y, w, h):
+        self.x, self.y, self.w, self.h = x, y, w, h
+
+    def crop(self):
+        print(str(self.y) + ", " + str(self.y+self.h) + ", " + str(self.x) + ", " + str(self.x+self.w))
+        crop = self.frame[self.y:self.y+self.h, self.x:self.x+self.w].copy()
+        height, width = crop.shape[:2]
+        print(width)
+        ratio = height/width
+        self.width = 400
+        self.height = round(self.width * ratio)
+        self.frame = crop
+        self.frame = cv2.resize(crop, (self.width, self.height))
+        height, width = self.frame.shape[:2]
+        print(width)
+        
 
 def main(): 
     app = RatTracker()
